@@ -29,9 +29,21 @@
       width: 100%;
       background: #ffffff;
     }
-    #messages { list-style-type: none; margin: 0; padding: 0; }
-    #messages li { padding: 5px 10px; }
-    #messages li:nth-child(odd) { background: #eee; }
+
+    #getName {
+      padding-top: 30px;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding-top: 30px; }
+
+    #messages li {
+      padding: 5px 10px; }
+
+    #messages li:nth-child(odd) {
+      background: #eee; }
   </style>
 
   <!-- Favicon
@@ -51,6 +63,7 @@
         </div>
         <div id="getName">
           <form id="user">
+            <p>What is your username?</p>
             <input id="un" autocomplete="off" /><br/>
             <button>Submit Username</button>
           </form>
