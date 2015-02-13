@@ -22,14 +22,10 @@
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
   <style>
-    .container {
-
-    }
-
     #header {
       position: fixed;
       top: 0;
-      height: 45px;
+      height: 60px;
       width: 100%;
       background: #ffffff;
     }
@@ -41,11 +37,12 @@
     #messages {
       list-style-type: none;
       margin: 0;
-      padding-top: 10px;
-      margin-bottom: 5px !important;
+      padding-top: 35px;
+      margin-bottom: 35px !important;
       }
 
     #messages li {
+      margin-bottom: 5px !important;
       padding: 5px 10px; }
 
     #messages li:nth-child(odd) {
@@ -64,6 +61,20 @@
       background: #ffffff;
       width: 100%;
     }
+
+    #usersOnline {
+      color: #D8DCDC;
+      padding: 0 0;
+      margin-top: -25px;
+      margin-bottom: 5px;
+    }
+
+    .currentTime {
+      display: block;
+      float: right;
+      color: #909093;
+      font-size: .75em;
+    }
   </style>
 
   <!-- Favicon
@@ -80,8 +91,11 @@
       <div class="twelve columns" style="margin-top: 5%">
         <div id="header">
           <h4>Dave's Simple Chat Service</h4>
+          <p id="usersOnline">0 users online</p>
         </div>
+
         <div id="getName">
+          <p></p>
           <form id="user">
             <p>What is your username?</p>
             <input id="un" autocomplete="off" />
@@ -109,6 +123,38 @@
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
+
+  function timeStamp() {
+  // Create a date object with the current time
+    var now = new Date();
+
+  // Create an array with the current month, day and time
+    var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
+
+  // Create an array with the current hour, minute and second
+    var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+
+  // Determine AM or PM suffix based on the hour
+    var suffix = ( time[0] < 12 ) ? "AM" : "PM";
+
+  // Convert hour from military time
+    time[0] = ( time[0] < 12 ) ? time[0] : time[0] - 12;
+
+  // If hour is 0, set it to 12
+    time[0] = time[0] || 12;
+
+  // If seconds and minutes are less than 10, add a zero
+    for ( var i = 1; i < 3; i++ ) {
+      if ( time[i] < 10 ) {
+        time[i] = "0" + time[i];
+      }
+    }
+
+  // Return the formatted string
+    return time.join(":") + " " + suffix;
+  }
+
+
     // On initial page load, let's use jQuery to hide our
     // message div and the send message form so we can
     // ask for a username first.
@@ -121,6 +167,7 @@
       $('#getName').hide();
       $('#messages').show();
       $('#sendMessage').show();
+      document.getElementById("m").focus();
       return false;
     })
 
@@ -132,9 +179,18 @@
     });
 
     socket.on('chat message', function(username, msg){
-      $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + '</li>'));
-
+      var currTime = "<span class=\"currentTime\">" + timeStamp() + "</span>";
+      $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + " " + currTime + '</li>'));
     });
+
+    socket.on('user count', function(userCount) {
+      $('#usersOnline').html(userCount + " users online");
+    })
+
+    $(document).ready(function($) {
+
+    })
+
   </script>
 </body>
 </html>

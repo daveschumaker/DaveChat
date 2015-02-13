@@ -33,6 +33,7 @@ app.get('/', function(req, res) {
 
 // Store all usernames that are connected to the chat app.
 var usernames = {};
+    userCount = 0; // Count total number of users.
 
 // Use this to store HTML entities we want to escape.
 // There's probably a better way, but hey.
@@ -55,7 +56,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', function(socket){
   //io.emit('chat message', 'a user has connected. :)');
+  userCount++; // Increment the number of active users.
+  io.emit('user count', userCount); // Send number of users to client.
   console.log("a user has connected");
+  console.log('Users online: ' + userCount);
+
+
+  socket.on('user count', function(usersOnline) {
+    io.emit('user count', userCount);
+  })
 
   socket.on('username', function(username) {
     socket.username = username; // we store the username in the socket session for this client
@@ -65,13 +74,16 @@ io.on('connection', function(socket){
     //io.emit('username', username);
     //io.emit('username', socket.username);
     msg = escapeHtml(msg); // Escape random HTML entities if someone posts code into message box.
-    io.emit('chat message',  socket.username, msg);
+    io.emit('chat message',  socket.username, msg, userCount);
     //console.log('username: ' + socket.username);
     console.log('(message) ' + socket.username + ": " + msg);
   });
 
   socket.on('disconnect', function() {
+    userCount--; // Decrease the number of active users
+    io.emit('user count', userCount);
     //io.emit('chat message', 'a user has disconnected. :(');
+    console.log('Users online: ' + userCount);
     console.log('user disconnected');
   });
 });
