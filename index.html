@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Dave's Simple Chat Service in Node.js</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <style>
+    #header {
+      position: fixed;
+      top: 0px;
+      height: 40px;
+      width: 100%;
+      background: #ffffff;
+    }
+    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages li { padding: 5px 10px; }
+    #messages li:nth-child(odd) { background: #eee; }
+  </style>
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container">
+    <div class="row">
+      <div class="twelve columns" style="margin-top: 5%">
+        <div id="header">
+          <h4>Dave's Simple Chat Service</h4>
+        </div>
+        <div id="getName">
+          <form id="user">
+            <input id="un" autocomplete="off" /><br/>
+            <button>Submit Username</button>
+          </form>
+        </div>
+
+
+        <p id="messages"></p>
+        <form id="sendMessage" action="">
+          <input id="m" autocomplete="off" />
+          <br/><button>Send Message</button>
+        </form>
+        </div>
+    </div>
+  </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+  $('#sendMessage').hide();
+  $('#messages').hide();
+
+    var socket = io();
+    $('#getName').submit(function () {
+      socket.emit('username', $('#un').val());
+      $('#getName').hide();
+      $('#messages').show();
+      $('#sendMessage').show();
+      return false;
+    })
+
+
+    $('#sendMessage').submit(function () {
+      socket.emit('chat message', $('#m').val());
+      $('#m').val('');
+      return false;
+    });
+
+    socket.on('chat message', function(username, msg){
+      $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + '</li>'));
+      //$('#messages').append($('<li>').text(msg).after('</li>'));
+    });
+
+    console.log(test);
+
+  </script>
+</body>
+</html>
