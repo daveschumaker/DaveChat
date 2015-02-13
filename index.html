@@ -109,9 +109,11 @@
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
-
-  $('#sendMessage').hide();
-  $('#messages').hide();
+    // On initial page load, let's use jQuery to hide our
+    // message div and the send message form so we can
+    // ask for a username first.
+    $('#sendMessage').hide();
+    $('#messages').hide();
 
     var socket = io();
     $('#getName').submit(function () {
@@ -121,7 +123,6 @@
       $('#sendMessage').show();
       return false;
     })
-
 
     $('#sendMessage').submit(function () {
       socket.emit('chat message', $('#m').val());
@@ -134,9 +135,6 @@
       $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + '</li>'));
 
     });
-
-    console.log(test);
-
   </script>
 </body>
 </html>

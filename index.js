@@ -64,7 +64,7 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg) {
     //io.emit('username', username);
     //io.emit('username', socket.username);
-    msg = escapeHtml(msg);
+    msg = escapeHtml(msg); // Escape random HTML entities if someone posts code into message box.
     io.emit('chat message',  socket.username, msg);
     //console.log('username: ' + socket.username);
     console.log('(message) ' + socket.username + ": " + msg);
