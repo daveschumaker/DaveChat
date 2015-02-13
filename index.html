@@ -22,9 +22,13 @@
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
   <style>
+    .container {
+
+    }
+
     #header {
       position: fixed;
-      top: 0px;
+      top: 0;
       height: 40px;
       width: 100%;
       background: #ffffff;
@@ -37,13 +41,29 @@
     #messages {
       list-style-type: none;
       margin: 0;
-      padding-top: 30px; }
+      padding-top: 30px;
+      margin-bottom: 5px !important;
+      }
 
     #messages li {
       padding: 5px 10px; }
 
     #messages li:nth-child(odd) {
       background: #eee; }
+
+    #m {
+      width: 300px;
+    }
+
+    #sendMessage {
+      position: fixed;
+      bottom: 0;
+      margin-bottom: 0 !important;
+      height: 50px;
+      /*height: 40px;*/
+      background: #ffffff;
+      width: 100%;
+    }
   </style>
 
   <!-- Favicon
@@ -55,7 +75,7 @@
 
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="container">
+  <div class="container" style="margin-bottom:100px;">
     <div class="row">
       <div class="twelve columns" style="margin-top: 5%">
         <div id="header">
@@ -64,26 +84,32 @@
         <div id="getName">
           <form id="user">
             <p>What is your username?</p>
-            <input id="un" autocomplete="off" /><br/>
+            <input id="un" autocomplete="off" />
             <button>Submit Username</button>
           </form>
         </div>
 
-
-        <p id="messages"></p>
-        <form id="sendMessage" action="">
-          <input id="m" autocomplete="off" />
-          <br/><button>Send Message</button>
-        </form>
+        <div id="messageContainer">
+          <p id="messages"></p>
         </div>
+      </div>
     </div>
   </div>
+
+  <div class="container">
+    <form id="sendMessage" action="">
+      <input id="m" autocomplete="off" />
+      <button>Send Message</button>
+    </form>
+  </div>
+
 
 <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
+
   $('#sendMessage').hide();
   $('#messages').hide();
 
@@ -100,12 +126,13 @@
     $('#sendMessage').submit(function () {
       socket.emit('chat message', $('#m').val());
       $('#m').val('');
+      window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
       return false;
     });
 
     socket.on('chat message', function(username, msg){
       $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + '</li>'));
-      //$('#messages').append($('<li>').text(msg).after('</li>'));
+
     });
 
     console.log(test);

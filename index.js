@@ -34,6 +34,23 @@ app.get('/', function(req, res) {
 // Store all usernames that are connected to the chat app.
 var usernames = {};
 
+// Use this to store HTML entities we want to escape.
+// There's probably a better way, but hey.
+var entityMap = {
+   "&": "&amp;",
+   "<": "&lt;",
+   ">": "&gt;",
+   '"': '&quot;',
+   "'": '&#39;',
+   "/": '&#x2F;'
+ };
+
+function escapeHtml(string) {
+  return String(string).replace(/[&<>"'\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', function(socket){
@@ -47,6 +64,7 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg) {
     //io.emit('username', username);
     //io.emit('username', socket.username);
+    msg = escapeHtml(msg);
     io.emit('chat message',  socket.username, msg);
     //console.log('username: ' + socket.username);
     console.log('(message) ' + socket.username + ": " + msg);
