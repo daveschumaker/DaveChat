@@ -11,7 +11,7 @@
 
   <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
 
   <!-- FONT
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -30,8 +30,25 @@
       background: #ffffff;
     }
 
+    #footer {
+      position: fixed;
+      bottom: 0;
+      height: 60px;
+      width: 100%;
+      background: #ffffff;
+    }
+
+    .chatImages {
+      max-width: 80%;
+      padding-left:5%;
+    }
+
     #getName {
       padding-top: 30px;
+    }
+
+    #messageContainer {
+      /*height:100%;*/
     }
 
     #messages {
@@ -49,7 +66,7 @@
       background: #eee; }
 
     #m {
-      width: 300px;
+      width: 50%;
     }
 
     #sendMessage {
@@ -93,7 +110,7 @@
   <div class="container" style="margin-bottom:50px;">
     <div class="row">
       <div class="twelve columns" style="margin-top: 5%">
-        <div id="header">
+        <div id="header" data-role="header" data-position="fixed">
           <h4>Dave's Simple Chat Service</h4>
           <p id="usersOnline"><span id="currentUsers">0 users online</span> | <a href="https://github.com/rockbandit/DaveChat" target="_blank">what's this?</a></p>
         </div>
@@ -110,16 +127,19 @@
         <div id="messageContainer">
           <p id="messages"></p>
         </div>
+
+        <div id="footer" data-role="footer" data-position="fixed">
+          <form id="sendMessage" action="">
+            <input id="m" autocomplete="off" />
+            <button>Send Message</button>
+          </form>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <div class="container">
-    <form id="sendMessage" action="">
-      <input id="m" autocomplete="off" />
-      <button>Send Message</button>
-    </form>
-  </div>
+
 
 
 <!-- End Document
@@ -127,31 +147,52 @@
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script>
 
-    // Try to linkify any proper URL?
+    // Try to linkify any properly detected URL
+    // If we detect an image (ends in gif/jpg/png extensions, let's display it)
     String.prototype.parseURL = function() {
       return this.replace(/[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&~\?\/.=]+/g, function(url) {
 
-        var displayURL = url;
-        urlCount = url.length;
-        // Truncate extra long URLs
-        if (url.length > 40) {
-          displayURL = url.substring(0,35);
-          displayURL = displayURL + "…";
-        }
+        function checkImg(url) {
+          var imgDetected = false;
+          var newURL;
+          var suffix;
+          var imgExt = [
+            "gif",
+            "jpg",
+            "png"
+          ];
 
-        var newURL = "<a href=\"" + url + "\" target=\"_blank\">" + displayURL + "<a/>";
+          for (var i=0; i < imgExt.length; i++) {
+            suffix = imgExt[i];
+            if (url.indexOf(suffix, url.length - suffix.length) !== -1) {
+              newURL = "<br/><br/><img class=\"chatImages\" src=\"" + url + "\">";
+              imgDetected = true;
+              //return newURL;
+            }
+          }
+
+          if (imgDetected == false) {
+            var displayURL = url;
+            urlCount = url.length;
+            // Truncate extra long URLs
+            if (url.length > 40) {
+              //displayURL = url.substring(0,35);
+              //displayURL = displayURL + "…";
+            }
+
+            newURL = "<a href=\"" + url + "\" target=\"_blank\">" + displayURL + "<a/>";
+          }
+
+          return newURL;
+        };
+
+        newURL = checkImg(url);
         return newURL;
         //return url.link(url);
       });
     };
 
-    // Potentially find the beginnings of any URL and then convert stuff.
-    function findURL(chatmessage) {
-      if (chatmessage.indexOf("http:&#x2F;&#x2F;") != -1) {
-        chatmessage = chatmessage.replace(/&#x2F;/g, "/");
-      }
-      return chatmessage;
-    }
+    // Detect if our URL ends with an image link. If so, let's embed the image!
 
     // Create a nice timestamp
     function timeStamp() {
@@ -209,14 +250,20 @@
 
     socket.on('chat message', function(username, msg){
       var currTime = "<span class=\"currentTime\">" + timeStamp() + "</span>";
-      msg = findURL(msg);
-      //msg = msg.parseURL;
-      console.log(typeof msg);
-      $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + " " + currTime + '</li>'));
+      //msg = findURL(msg);
+      msg = msg.parseURL();
+      $('#messages').append($('<li>' + currTime + '<strong>' + username + ':</strong> ' + msg + '</li>'));
     });
 
     socket.on('user count', function(userCount) {
-      $('#currentUsers').html(userCount + " users online");
+      var userMessage;
+      if (userCount == 1) {
+        userMessage = "1 user online";
+      } else {
+        userMessage = userCount + " users online";
+      }
+
+      $('#currentUsers').html(userMessage);
     })
 
   </script>

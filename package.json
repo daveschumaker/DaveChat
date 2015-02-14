@@ -2,7 +2,7 @@
   "name": "davechat",
   "version": "0.0.2",
   "description": "learning about socket.io by creating a simple chat app",
-  "author" : "Dave Schumaker <dave@rockbandit.net>",
+  "author": "Dave Schumaker <dave@rockbandit.net>",
   "main": "index.js",
   "engines": {
     "node": "0.12.x"
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "express": "^4.10.2",
+    "sanitizer": "^0.1.2",
     "socket.io": "^1.3.3"
   }
 }

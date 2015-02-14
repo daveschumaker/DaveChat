@@ -1,6 +1,6 @@
 # Dave's Simple Chat Service
 
-![](https://raw.githubusercontent.com/rockbandit/DaveChat/master/screenshots/Screenshot%202015-02-13%2008.53.12.png)
+![](https://raw.githubusercontent.com/rockbandit/DaveChat/master/screenshots/screenshot.png)
 
 Note: You can see this in action on Heroku: [https://davechat.herokuapp.com/](https://davechat.herokuapp.com/)
 
@@ -18,3 +18,5 @@ In the interest of learning more about Node.js (and JavaScript!), I've been work
 * Number of active users!
 * Timestamps on messages!
 * Sanitizing user input!
+* Properly autolink URLs!
+* Detect if a link to an image is pasted in and expand!

@@ -4,6 +4,7 @@ var express = require('express');
     io = require('socket.io')(http);
     path = require('path');
     os = require('os');
+    sanitizer = require('sanitizer');
 
 // Get local IP address of server for development purposes.
 function getIPaddres() {
@@ -35,23 +36,6 @@ app.get('/', function(req, res) {
 var usernames = {};
     userCount = 0; // Count total number of users.
 
-// Use this to store HTML entities we want to escape.
-// There's probably a better way, but hey.
-var entityMap = {
-   "&": "&amp;",
-   "<": "&lt;",
-   ">": "&gt;",
-   '"': '&quot;',
-   "'": '&#39;',
-   "/": '&#x2F;'
- };
-
-function escapeHtml(string) {
-  return String(string).replace(/[&<>"'\/]/g, function (s) {
-    return entityMap[s];
-  });
-}
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', function(socket){
@@ -71,12 +55,8 @@ io.on('connection', function(socket){
   })
 
   socket.on('chat message', function(msg) {
-    //io.emit('username', username);
-    //io.emit('username', socket.username);
-    msg = escapeHtml(msg); // Escape random HTML entities if someone posts code into message box.
-    //msg = msg.parseURL(msg); // Attempting to parse URLs...
+    msg = sanitizer.escape(msg);
     io.emit('chat message',  socket.username, msg, userCount);
-    //console.log('username: ' + socket.username);
     console.log('(message) ' + socket.username + ": " + msg);
   });
 
