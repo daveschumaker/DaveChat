@@ -1,8 +1,16 @@
 {
-  "name": "dave-chat",
-  "version": "0.0.1",
-  "description": "my first socket.io app",
+  "name": "davechat",
+  "version": "0.0.2",
+  "description": "learning about socket.io by creating a simple chat app",
+  "author" : "Dave Schumaker <dave@rockbandit.net>",
   "main": "index.js",
+  "engines": {
+    "node": "0.12.x"
+  }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rockbandit/DaveChat"
+  },
   "scripts": {
     "start": "node index.js"
   },
