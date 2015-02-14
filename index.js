@@ -74,6 +74,7 @@ io.on('connection', function(socket){
     //io.emit('username', username);
     //io.emit('username', socket.username);
     msg = escapeHtml(msg); // Escape random HTML entities if someone posts code into message box.
+    //msg = msg.parseURL(msg); // Attempting to parse URLs...
     io.emit('chat message',  socket.username, msg, userCount);
     //console.log('username: ' + socket.username);
     console.log('(message) ' + socket.username + ": " + msg);

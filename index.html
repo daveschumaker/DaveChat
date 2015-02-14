@@ -63,7 +63,7 @@
     }
 
     #usersOnline {
-      color: #D8DCDC;
+      color: #8A8A8A;
       padding: 0 0;
       margin-top: -25px;
       margin-bottom: 5px;
@@ -91,7 +91,7 @@
       <div class="twelve columns" style="margin-top: 5%">
         <div id="header">
           <h4>Dave's Simple Chat Service</h4>
-          <p id="usersOnline">0 users online</p>
+          <p id="usersOnline"><span id="currentUsers">0 users online</span> | <a href="https://github.com/rockbandit/DaveChat" target="_blank">what's this?</a></p>
         </div>
 
         <div id="getName">
@@ -124,6 +124,33 @@
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
 
+  // Try to linkify any proper URL?
+  String.prototype.parseURL = function() {
+    return this.replace(/[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&~\?\/.=]+/g, function(url) {
+
+      var displayURL = url;
+      urlCount = url.length;
+      // Truncate extra long URLs
+      if (url.length > 40) {
+        displayURL = url.substring(0,35);
+        displayURL = displayURL + "…";
+      }
+
+      var newURL = "<a href=\"" + url + "\" target=\"_blank\">" + displayURL + "<a/>";
+      return newURL;
+      //return url.link(url);
+    });
+  };
+
+  // Potentially find the beginnings of any URL and then convert stuff.
+  function findURL(chatmessage) {
+    if (chatmessage.indexOf("http:&#x2F;&#x2F;") != -1) {
+      chatmessage = chatmessage.replace(/&#x2F;/g, "/");
+    }
+    return chatmessage;
+  }
+
+  // Create a nice timestamp
   function timeStamp() {
   // Create a date object with the current time
     var now = new Date();
@@ -180,11 +207,14 @@
 
     socket.on('chat message', function(username, msg){
       var currTime = "<span class=\"currentTime\">" + timeStamp() + "</span>";
+      msg = findURL(msg);
+      //msg = msg.parseURL;
+      console.log(typeof msg);
       $('#messages').append($('<li><strong>' + username + ':</strong> ' + msg + " " + currTime + '</li>'));
     });
 
     socket.on('user count', function(userCount) {
-      $('#usersOnline').html(userCount + " users online");
+      $('#currentUsers').html(userCount + " users online");
     })
 
     $(document).ready(function($) {
