@@ -12,7 +12,7 @@ This little web app is more or less a result of tutorial and I've added some add
 
 ### Things I've added
 
-In the interest of learning more about Node.js (and JavaScript!), I've been working on adding a few more things than the default socket.io library has. This includes things like:
+In the interest of learning more about Node.js (and JavaScript!), I've been working on adding a few more things than the default socket.io chat app tutorial has. This includes things like:
 
 * Usernames!
 * Number of active users!
@@ -20,3 +20,14 @@ In the interest of learning more about Node.js (and JavaScript!), I've been work
 * Sanitizing user input!
 * Properly autolink URLs!
 * Detect if a link to an image is pasted in and expand!
+
+### Things to potentially do
+
+* Display a list of all connected users!
+* Check for identical usernames and prompt for different name
+* Limit username to X number of characters (and validate name so no null values are allowed).
+* Prevent flooding chat with null values / null data.
+* Embed YouTube videos? Instagram posts? Etc?
+* Display welcome message on connect
+* Play around with idea of adding admin options (kick user, ban user)
+* Play around with idea of having a blacklist for certain words and phrases

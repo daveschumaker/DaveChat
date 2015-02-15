@@ -30,15 +30,19 @@
       background: #ffffff;
     }
 
-    #footer {
+    #footer, #footerPush {
       position: fixed;
       bottom: 0;
       height: 60px;
       width: 100%;
       background: #ffffff;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .chatImages {
+      padding-top: 5px;
       max-width: 80%;
       padding-left:5%;
     }
@@ -48,14 +52,15 @@
     }
 
     #messageContainer {
-      /*height:100%;*/
+      height: 100%;
+      margin-bottom: 5px;
     }
 
     #messages {
       list-style-type: none;
       margin: 0;
-      padding-top: 35px;
-      margin-bottom: 35px !important;
+      /*padding-top: 35px;*/
+      /*margin-bottom: 35px !important;*/
       }
 
     #messages li {
@@ -83,6 +88,11 @@
       color: #8A8A8A;
       padding: 0 0;
       margin-top: -25px;
+      margin-bottom: 5px;
+    }
+
+    #welcomeMessage {
+      padding-top: 45px;
       margin-bottom: 5px;
     }
 
@@ -119,23 +129,29 @@
           <p></p>
           <form id="user">
             <p>What is your username?</p>
+            <p id="alertMessage"></p>
             <input id="un" autocomplete="off" />
             <button>Submit Username</button>
           </form>
         </div>
 
         <div id="messageContainer">
+          <p id="welcomeMessage">Welcome! Start chatting away whenever you're ready.</p>
           <p id="messages"></p>
         </div>
 
-        <div id="footer" data-role="footer" data-position="fixed">
-          <form id="sendMessage" action="">
-            <input id="m" autocomplete="off" />
-            <button>Send Message</button>
-          </form>
-        </div>
+        <div id="footerPush"></div>
 
       </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="footer">
+      <form id="sendMessage" action="">
+        <input id="m" autocomplete="off" />
+        <button>Send Message</button>
+      </form>
     </div>
   </div>
 
@@ -146,6 +162,8 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script>
+
+    var allUsernames = new Array(); // Store a list of all usernames
 
     // Try to linkify any properly detected URL
     // If we detect an image (ends in gif/jpg/png extensions, let's display it)
@@ -165,7 +183,7 @@
           for (var i=0; i < imgExt.length; i++) {
             suffix = imgExt[i];
             if (url.indexOf(suffix, url.length - suffix.length) !== -1) {
-              newURL = "<br/><br/><img class=\"chatImages\" src=\"" + url + "\">";
+              newURL = "<br/><img class=\"chatImages\" src=\"" + url + "\">";
               imgDetected = true;
               //return newURL;
             }
@@ -225,27 +243,60 @@
       return time.join(":") + " " + suffix;
     }
 
+    // Detect if user entered whitespace
+    function isEmpty(str) {
+      return str.replace(/^\s+|\s+$/g, '').length == 0;
+    }
+
     // On initial page load, let's use jQuery to hide our
     // message div and the send message form so we can
     // ask for a username first.
     $('#sendMessage').hide();
     $('#messages').hide();
+    $('#welcomeMessage').hide();
 
     var socket = io();
     $('#getName').submit(function () {
-      socket.emit('username', $('#un').val());
-      $('#getName').hide();
-      $('#messages').show();
-      $('#sendMessage').show();
-      document.getElementById("m").focus();
-      return false;
+      var myUsername = $('#un').val();
+
+
+      if (isEmpty(myUsername)) {
+        // User entered no data. Do nothing!
+        $('#un').val('');
+        return false;
+      } else {
+        console.log("Users: " + allUsernames);
+        if (allUsernames.indexOf(myUsername) == -1) {
+          // Username not found in array, go ahead and add it!
+          socket.emit('username', $('#un').val());
+          $('#getName').hide();
+          $('#welcomeMessage').show();
+          $('#messages').show();
+          $('#sendMessage').show();
+          document.getElementById("m").focus();
+          return false;
+        } else {
+          $('#alertMessage').html("<strong>Error:</strong> Username already taken, please choose another.");
+          return false;
+        }
+
+
+      }
     })
 
     $('#sendMessage').submit(function () {
-      socket.emit('chat message', $('#m').val());
-      $('#m').val('');
-      window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
-      return false;
+      if ($('#m').val() == "" || $('#m').val() == null || isEmpty($('#m').val())) {
+        // User entered nothing in the chat box.
+        // Do nothing!
+        $('#m').val('');
+        return false;
+      } else {
+        //window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
+        return false;
+      }
     });
 
     socket.on('chat message', function(username, msg){
@@ -253,6 +304,13 @@
       //msg = findURL(msg);
       msg = msg.parseURL();
       $('#messages').append($('<li>' + currTime + '<strong>' + username + ':</strong> ' + msg + '</li>'));
+    });
+
+    // Get list of usernames.
+    // In theory, this is probably a bad idea, since a user could change the code
+    // on his client and bypass our check. This should happen on the server.
+    socket.on('usernames', function(usernames) {
+      allUsernames = usernames;
     });
 
     socket.on('user count', function(userCount) {
