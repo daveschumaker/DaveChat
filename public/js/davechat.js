@@ -130,7 +130,15 @@ $('#getName').submit(function () {
       $('#welcomeMessage').show();
       $('#messages').show();
       $('#footer_container').show();
-      document.getElementById("m").focus();
+
+      // Check if user is using iPhone so we don't autofocus on chat box.
+      if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+         // Do nothing for now.
+      } else {
+        document.getElementById("m").focus();
+      }
+
+
       return false;
     } else {
       $('#alertMessage').html("<strong>Error:</strong> Username already taken, please choose another.");
@@ -153,6 +161,12 @@ $('#sendMessage').submit(function () {
     $('#m').val('');
     window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
     userScroll = false;
+
+    // Check if user is using iPhone so we automatically hide the keyboard after they send a message
+    if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+      document.activeElement.blur();
+    }
+
     return false;
   }
 });

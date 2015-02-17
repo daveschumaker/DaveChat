@@ -77,14 +77,12 @@ io.on('connection', function(socket){
   })
 
   socket.on('username', function(username) {
-    userCount++; // Increment the number of active users.
-    io.emit('user count', userCount); // Send number of users to client.
-    io.emit('usernames', usernames);
-
     socket.username = username; // we store the username in the socket session for this client
     usernames.push(username); // Add this to our user array.
     console.log('Active users: ' + usernames);
     io.emit('usernames', usernames); // Send array of usernames to client.
+    userCount = usernames.length;
+    io.emit('user count', userCount); // Send number of users to client.
   })
 
   socket.on('chat message', function(msg) {
@@ -98,7 +96,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function() {
-    userCount--; // Decrease the number of active users
+    userCount = usernames.length; // Decrease the number of active users
     if (userCount < 0) {
       userCount = 0;
     }
