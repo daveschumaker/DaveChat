@@ -70,7 +70,7 @@ io.on('connection', function(socket){
     io.emit('user count', userCount);
     io.emit('usernames', usernames);
     io.emit('my username', socket.username); // Send the user's username so we can detect if server rebooted.
-  }, 10000);
+  }, 2500);
 
   socket.on('user count', function(usersOnline) {
     io.emit('user count', userCount);
@@ -79,11 +79,11 @@ io.on('connection', function(socket){
   socket.on('username', function(username) {
     userCount++; // Increment the number of active users.
     io.emit('user count', userCount); // Send number of users to client.
+    io.emit('usernames', usernames);
 
     socket.username = username; // we store the username in the socket session for this client
     usernames.push(username); // Add this to our user array.
     console.log('Active users: ' + usernames);
-    io.emit('my username', socket.username);
     io.emit('usernames', usernames); // Send array of usernames to client.
   })
 

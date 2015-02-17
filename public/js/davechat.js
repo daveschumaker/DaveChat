@@ -184,3 +184,50 @@ socket.on('my username', function(username) {
     //loadPage(); // Kick this user out and force them to log in again.
   }
 });
+
+/*
+
+<ul>
+   <li>Subitem One</li><li>
+   <a href="#">What's this?</a></li></ul>
+
+*/
+
+socket.on('user count', function(userCount) {
+
+  function printUsers() {
+    var tempHTML;
+    for (var i = 0; i < allUsernames.length; i++) {
+      if (typeof tempHTML == "undefined") {
+        tempHTML = "<ul><li>" + allUsernames[i] + "</li>";
+      } else {
+        tempHTML = tempHTML + "<li>" + allUsernames[i] + "</li>";
+      }
+    }
+
+    tempHTML = tempHTML + "</ul>";
+    return tempHTML;
+  }
+
+  var userMessage;
+  if (userCount == 1) {
+    userMessage = "1 user online";
+  } else {
+    userMessage = userCount + " users online";
+  }
+
+  if (allUsernames.length == 0) {
+    userMessage = "<a href=\"#\">" + userMessage + "</a>";
+  } else {
+    userMessage = "<a href=\"#\">" + userMessage + "</a>" + printUsers();
+  }
+
+  $('#currentUsers').html(userMessage);
+})
+
+$(document).ready(function () {
+  $(window).scroll(function (){
+    //console.log("You scrolled!");
+    userScrolled=true;
+  })
+})
