@@ -57,22 +57,33 @@ Array.prototype.remove = function() {
 
 io.on('connection', function(socket){
   //io.emit('chat message', 'a user has connected. :)');
-  userCount++; // Increment the number of active users.
-  io.emit('user count', userCount); // Send number of users to client.
-  io.emit('usernames', usernames);
+  //userCount++; // Increment the number of active users.
+  //io.emit('user count', userCount); // Send number of users to client.
+  //io.emit('usernames', usernames);
   console.log("a user has connected");
   console.log('Users online: ' + userCount);
   //console.log("Length: " + usernames.length + " Usernames: " + usernames);
 
+  // Emit an updated list of usernames and the userCount ever 5 seconds
+  setInterval(function() {
+    usernames.sort(); // Sort username array alphabetically
+    io.emit('user count', userCount);
+    io.emit('usernames', usernames);
+    io.emit('my username', socket.username); // Send the user's username so we can detect if server rebooted.
+  }, 10000);
 
   socket.on('user count', function(usersOnline) {
     io.emit('user count', userCount);
   })
 
   socket.on('username', function(username) {
+    userCount++; // Increment the number of active users.
+    io.emit('user count', userCount); // Send number of users to client.
+
     socket.username = username; // we store the username in the socket session for this client
     usernames.push(username); // Add this to our user array.
     console.log('Active users: ' + usernames);
+    io.emit('my username', socket.username);
     io.emit('usernames', usernames); // Send array of usernames to client.
   })
 
@@ -88,6 +99,9 @@ io.on('connection', function(socket){
 
   socket.on('disconnect', function() {
     userCount--; // Decrease the number of active users
+    if (userCount < 0) {
+      userCount = 0;
+    }
     usernames.remove(socket.username);
     io.emit('user count', userCount);
     io.emit('usernames', usernames); // Send array of usernames to client.

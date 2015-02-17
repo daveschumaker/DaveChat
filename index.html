@@ -21,88 +21,7 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
-  <style>
-    #header {
-      position: fixed;
-      top: 0;
-      height: 60px;
-      width: 100%;
-      background: #ffffff;
-    }
-
-    #footer, #footerPush {
-      position: fixed;
-      bottom: 0;
-      height: 60px;
-      width: 100%;
-      background: #ffffff;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .chatImages {
-      padding-top: 5px;
-      max-width: 80%;
-      padding-left:5%;
-    }
-
-    #getName {
-      padding-top: 30px;
-    }
-
-    #messageContainer {
-      height: 100%;
-      margin-bottom: 5px;
-    }
-
-    #messages {
-      list-style-type: none;
-      margin: 0;
-      /*padding-top: 35px;*/
-      /*margin-bottom: 35px !important;*/
-      }
-
-    #messages li {
-      margin-bottom: 5px !important;
-      padding: 5px 10px; }
-
-    #messages li:nth-child(odd) {
-      background: #eee; }
-
-    #m {
-      width: 50%;
-    }
-
-    #sendMessage {
-      position: fixed;
-      bottom: 0;
-      margin-bottom: 0 !important;
-      height: 50px;
-      /*height: 40px;*/
-      background: #ffffff;
-      width: 100%;
-    }
-
-    #usersOnline {
-      color: #8A8A8A;
-      padding: 0 0;
-      margin-top: -25px;
-      margin-bottom: 5px;
-    }
-
-    #welcomeMessage {
-      padding-top: 45px;
-      margin-bottom: 5px;
-    }
-
-    .currentTime {
-      display: block;
-      float: right;
-      color: #909093;
-      font-size: .75em;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 
   <!-- Script
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -115,215 +34,68 @@
 </head>
 <body>
 
+  <!-- BEGIN: Sticky Header -->
+  <div id="header_container">
+      <div id="header">
+          <h4>Dave's Simple Chat Service</h4>
+      </div>
+
+      <div id="navMenu">
+        <ul id="navbar">
+        <!-- The strange spacing herein prevents an IE6 whitespace bug. -->
+           <li id="currentUsers"><a href="#">0 users online</a>
+           </li>
+           <li><a href="https://github.com/rockbandit/DaveChat" target="_blank">What's this?</a>
+           </li>
+        </ul>
+      </div>
+  </div>
+  <!-- END: Sticky Header -->
+
+  <!-- BEGIN: Users list / Nav Menu -->
+
+
+
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="container" style="margin-bottom:50px;">
+  <div class="container">
     <div class="row">
-      <div class="twelve columns" style="margin-top: 5%">
-        <div id="header" data-role="header" data-position="fixed">
-          <h4>Dave's Simple Chat Service</h4>
-          <p id="usersOnline"><span id="currentUsers">0 users online</span> | <a href="https://github.com/rockbandit/DaveChat" target="_blank">what's this?</a></p>
-        </div>
+      <div class="twelve columns">
 
         <div id="getName">
           <p></p>
           <form id="user">
-            <p>What is your username?</p>
+            <p>Hello! Please choose a username to get started!</p>
             <p id="alertMessage"></p>
-            <input id="un" autocomplete="off" />
+            <input id="un" autocomplete="off" maxlength="20" />
             <button>Submit Username</button>
           </form>
         </div>
 
         <div id="messageContainer">
-          <p id="welcomeMessage">Welcome! Start chatting away whenever you're ready.</p>
+          <p id="welcomeMessage"><strong>Welcome to this public chat server, built using Node.js! Start chatting away whenever you're ready. </strong></p>
           <p id="messages"></p>
         </div>
-
-        <div id="footerPush"></div>
 
       </div>
     </div>
   </div>
 
-  <div class="container">
-    <div id="footer">
-      <form id="sendMessage" action="">
-        <input id="m" autocomplete="off" />
-        <button>Send Message</button>
-      </form>
-    </div>
+  <!-- BEGIN: Sticky Footer -->
+  <div id="footer_container">
+      <div id="footer">
+        <form id="sendMessage" action="">
+          <input id="m" autocomplete="off"/>
+          <button>Send Message</button>
+        </form>
+      </div>
   </div>
+  <!-- END: Sticky Footer -->
 
-
-
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="js/davechat.js"></script>
 
 <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-  <script>
-
-    var allUsernames = new Array(); // Store a list of all usernames
-
-    // Try to linkify any properly detected URL
-    // If we detect an image (ends in gif/jpg/png extensions, let's display it)
-    String.prototype.parseURL = function() {
-      return this.replace(/[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&~\?\/.=]+/g, function(url) {
-
-        function checkImg(url) {
-          var imgDetected = false;
-          var newURL;
-          var suffix;
-          var imgExt = [
-            "gif",
-            "jpg",
-            "png"
-          ];
-
-          for (var i=0; i < imgExt.length; i++) {
-            suffix = imgExt[i];
-            if (url.indexOf(suffix, url.length - suffix.length) !== -1) {
-              newURL = "<br/><img class=\"chatImages\" src=\"" + url + "\">";
-              imgDetected = true;
-              //return newURL;
-            }
-          }
-
-          if (imgDetected == false) {
-            var displayURL = url;
-            urlCount = url.length;
-            // Truncate extra long URLs
-            if (url.length > 40) {
-              //displayURL = url.substring(0,35);
-              //displayURL = displayURL + "…";
-            }
-
-            newURL = "<a href=\"" + url + "\" target=\"_blank\">" + displayURL + "<a/>";
-          }
-
-          return newURL;
-        };
-
-        newURL = checkImg(url);
-        return newURL;
-        //return url.link(url);
-      });
-    };
-
-    // Detect if our URL ends with an image link. If so, let's embed the image!
-
-    // Create a nice timestamp
-    function timeStamp() {
-    // Create a date object with the current time
-      var now = new Date();
-
-    // Create an array with the current month, day and time
-      var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
-
-    // Create an array with the current hour, minute and second
-      var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
-
-    // Determine AM or PM suffix based on the hour
-      var suffix = ( time[0] < 12 ) ? "AM" : "PM";
-
-    // Convert hour from military time
-      time[0] = ( time[0] < 12 ) ? time[0] : time[0] - 12;
-
-    // If hour is 0, set it to 12
-      time[0] = time[0] || 12;
-
-    // If seconds and minutes are less than 10, add a zero
-      for ( var i = 1; i < 3; i++ ) {
-        if ( time[i] < 10 ) {
-          time[i] = "0" + time[i];
-        }
-      }
-
-    // Return the formatted string
-      return time.join(":") + " " + suffix;
-    }
-
-    // Detect if user entered whitespace
-    function isEmpty(str) {
-      return str.replace(/^\s+|\s+$/g, '').length == 0;
-    }
-
-    // On initial page load, let's use jQuery to hide our
-    // message div and the send message form so we can
-    // ask for a username first.
-    $('#sendMessage').hide();
-    $('#messages').hide();
-    $('#welcomeMessage').hide();
-
-    var socket = io();
-    $('#getName').submit(function () {
-      var myUsername = $('#un').val();
-
-
-      if (isEmpty(myUsername)) {
-        // User entered no data. Do nothing!
-        $('#un').val('');
-        return false;
-      } else {
-        console.log("Users: " + allUsernames);
-        if (allUsernames.indexOf(myUsername) == -1) {
-          // Username not found in array, go ahead and add it!
-          socket.emit('username', $('#un').val());
-          $('#getName').hide();
-          $('#welcomeMessage').show();
-          $('#messages').show();
-          $('#sendMessage').show();
-          document.getElementById("m").focus();
-          return false;
-        } else {
-          $('#alertMessage').html("<strong>Error:</strong> Username already taken, please choose another.");
-          return false;
-        }
-
-
-      }
-    })
-
-    $('#sendMessage').submit(function () {
-      if ($('#m').val() == "" || $('#m').val() == null || isEmpty($('#m').val())) {
-        // User entered nothing in the chat box.
-        // Do nothing!
-        $('#m').val('');
-        return false;
-      } else {
-        //window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        window.scrollTo(0,document.body.scrollHeight); // Always scroll down to your latest message
-        return false;
-      }
-    });
-
-    socket.on('chat message', function(username, msg){
-      var currTime = "<span class=\"currentTime\">" + timeStamp() + "</span>";
-      //msg = findURL(msg);
-      msg = msg.parseURL();
-      $('#messages').append($('<li>' + currTime + '<strong>' + username + ':</strong> ' + msg + '</li>'));
-    });
-
-    // Get list of usernames.
-    // In theory, this is probably a bad idea, since a user could change the code
-    // on his client and bypass our check. This should happen on the server.
-    socket.on('usernames', function(usernames) {
-      allUsernames = usernames;
-    });
-
-    socket.on('user count', function(userCount) {
-      var userMessage;
-      if (userCount == 1) {
-        userMessage = "1 user online";
-      } else {
-        userMessage = userCount + " users online";
-      }
-
-      $('#currentUsers').html(userMessage);
-    })
-
-  </script>
 </body>
 </html>

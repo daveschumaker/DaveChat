@@ -1,0 +1,118 @@
+/*---- CROSS BROWSER DROPDOWN MENU ----*/
+#navbar {
+  background-color: #fff;
+   margin: 0;
+   padding: 0;
+   height: 25px;
+   z-index: 500;}
+#navbar li {
+  background-color: #fff;
+   list-style: none;
+   float: left; }
+#navbar li a {
+   display: block;
+   padding: 3px 8px;
+   background-color: #ffff;
+   color: #000;
+   text-decoration: none; }
+#navbar li a:hover {
+  background-color: #eee;
+}
+#navbar li ul {
+   display: none;
+   width: 10em; /* Width to help Opera out */
+   background-color: #fff;}
+#navbar li:hover ul, #navbar li.hover ul {
+   background-color: #fff;
+   border-top-style: none;
+   border-bottom: 1px solid #000;
+   border-left: 1px solid #000;
+   border-right: 1px solid #000;
+   display: block;
+   position: absolute;
+   margin: 0;
+   padding-left: 15px; }
+#navbar li:hover li, #navbar li.hover li {
+  background-color: #fff;
+  float: none; }
+#navbar li:hover li a, #navbar li.hover li a {
+   background-color: #eee;
+   border-bottom: 1px solid #fff;
+   color: #000; }
+
+#navMenu {
+  background-color: #fff;
+  height: 25px;
+  margin: 0 auto;
+  padding-left: 18px;
+  margin-top: -21px;
+  width: 100%;
+  z-index: 25;
+}
+
+@media (min-width: 400px) {
+  #navMenu {
+    margin-top: -22.5px;
+    padding-left: 0px;
+    width: 85%;
+  }
+}
+
+@media (min-width: 550px) {
+  #navMenu {
+    margin-top: -20.5px;
+    margin-left: 4%;
+    padding-left: 0px;
+  }
+}
+
+/* My code for styling all the chat stuff */
+
+.chatImages {
+  padding-top: 5px;
+  max-width: 80%;
+  padding-left:5%;
+}
+
+#messageContainer {
+  height: 100%;
+  margin-bottom: 5px;
+}
+
+#messages {
+  list-style-type: none;
+  margin: 0;
+  /*padding-top: 35px;*/
+  /*margin-bottom: 35px !important;*/
+  }
+
+#messages li {
+  margin-bottom: 5px !important;
+  padding: 5px 10px; }
+
+#messages li:nth-child(odd) {
+  background: #eee; }
+
+#m {
+  width: 50%;
+}
+
+#sendMessage {
+  height: 50px;
+  /*height: 40px;*/
+  width: 100%;
+}
+
+#usersOnline {
+  color: #8A8A8A;
+  padding: 0 0;
+  margin-top: -25px;
+  margin-bottom: 5px;
+}
+
+.currentTime {
+  display: block;
+  float: right;
+  color: #909093;
+  font-size: .75em;
+}
