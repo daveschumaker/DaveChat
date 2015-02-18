@@ -199,8 +199,8 @@ socket.on('usernames', function(usernames) {
 // We'll use this to detect whether the is no username detected (e.g., after the server reboots)
 socket.on('my username', function(username) {
   if (initialLoad == 1 && username === null) {
-    $('#alertMessage').html("<strong>Error:</strong> Ack, sorry!! Disconnected from the server. Please log in again. :)");
-    loadPage(); // Kick this user out and force them to log in again.
+    //$('#alertMessage').html("<strong>Error:</strong> Ack, sorry!! Disconnected from the server. Please log in again. :)");
+    //loadPage(); // Kick this user out and force them to log in again.
   }
 });
 

@@ -42,7 +42,7 @@ function isEmpty(str) {
 // Store all usernames that are connected to the chat app.
 var usernames = new Array();
 var userCount = 0; // Count total number of users.
-var clientUsername;
+//var socket.username;
 
 // Use this to easily remove users from our users array.
 Array.prototype.remove = function() {
@@ -70,7 +70,7 @@ io.on('connection', function(socket){
     usernames.sort(); // Sort username array alphabetically
     io.emit('user count', userCount);
     io.emit('usernames', usernames);
-    io.emit('my username', clientUsername); // Send the user's username so we can detect if server rebooted.
+    io.emit('my username', socket.username); // Send the user's username so we can detect if server rebooted.
   }, 2500);
 
   socket.on('user count', function(usersOnline) {
@@ -78,7 +78,7 @@ io.on('connection', function(socket){
   })
 
   socket.on('username', function(username) {
-    clientUsername = username; // we store the username in the socket session for this client
+    socket.username = username; // we store the username in the socket session for this client
     usernames.push(username); // Add this to our user array.
     console.log('Active users: ' + usernames);
     io.emit('usernames', usernames); // Send array of usernames to client.
@@ -92,8 +92,8 @@ io.on('connection', function(socket){
       // Do nothing, since the user entered nothing but whitespace.
     } else {
       msg = sanitizer.escape(msg);
-      io.emit('chat message',  clientUsername, msg, userCount);
-      console.log('(message) ' + clientUsername + ": " + msg);
+      io.emit('chat message',  socket.username, msg, userCount);
+      console.log('(message) ' + socket.username + ": " + msg);
     }
   });
 
@@ -103,8 +103,8 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function() {
-    io.emit('connection message', "<p class=\"connectionMessage\">" + clientUsername + " has disconnected.</p>", clientUsername);
-    usernames.remove(clientUsername);
+    io.emit('connection message', "<p class=\"connectionMessage\">" + socket.username + " has disconnected.</p>", socket.username);
+    usernames.remove(socket.username);
     //io.emit('chat message', 'a user has disconnected. :(');
     console.log('Active users: ' + usernames);
     console.log('Total users online: ' + userCount);
