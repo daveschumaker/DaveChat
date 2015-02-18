@@ -103,8 +103,13 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function() {
-    io.emit('connection message', "<p class=\"connectionMessage\">" + socket.username + " has disconnected.</p>", socket.username);
-    usernames.remove(socket.username);
+    console.log("socket.username " + typeof socket.username);
+    if (typeof socket.username === "undefined") {
+      // Don't do anything here.
+    } else {
+      io.emit('connection message', "<p class=\"connectionMessage\">" + socket.username + " has disconnected.</p>", socket.username);
+    }
+      usernames.remove(socket.username);
     //io.emit('chat message', 'a user has disconnected. :(');
     console.log('Active users: ' + usernames);
     console.log('Total users online: ' + userCount);
