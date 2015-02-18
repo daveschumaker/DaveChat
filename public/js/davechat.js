@@ -1,5 +1,8 @@
 var allUsernames = new Array(); // Store a list of all usernames
+var myUsername; // Store username of client
 var userScroll = false; // Track whether user scrolled the page so we can autofocus on new chats.
+var initialLoad = 0;  // Use this to check whether or not server rebooted.
+                      // e.g., 1 means user entered a username. If we detect this equal to 1 and socket.username == null, server has rebooted.
 
 // If the user scrolls the mouse, change value.
 function mouseEvent(e) {
@@ -33,7 +36,7 @@ String.prototype.parseURL = function() {
       for (var i=0; i < imgExt.length; i++) {
         suffix = imgExt[i];
         if (url.indexOf(suffix, url.length - suffix.length) !== -1) {
-          newURL = "<br/><img class=\"chatImages\" src=\"" + url + "\">";
+          newURL = "<br/><img class=\"chatImages\" src=\"" + url + "\"><br/>";
           imgDetected = true;
           //return newURL;
         }
@@ -103,9 +106,11 @@ function isEmpty(str) {
 // ask for a username first.
 function loadPage() {
   $('#getName').show();
+  $('#messageContainer').hide();
   $('#footer_container').hide();
-  $('#messages').hide();
-  $('#welcomeMessage').hide();
+  initialLoad = 0;
+  //$('#messages').hide();
+  //$('#welcomeMessage').hide();
   document.getElementById("un").focus();
 }
 
@@ -115,7 +120,7 @@ loadPage();
 
 var socket = io();
 $('#getName').submit(function () {
-  var myUsername = $('#un').val();
+  myUsername = $('#un').val();
 
 
   if (isEmpty(myUsername)) {
@@ -125,11 +130,12 @@ $('#getName').submit(function () {
   } else {
     if (allUsernames.indexOf(myUsername) == -1) {
       // Username not found in array, go ahead and add it!
+      initialLoad = 1;
       socket.emit('username', $('#un').val());
       $('#getName').hide();
-      $('#welcomeMessage').show();
-      $('#messages').show();
-      $('#footer_container').show();
+      $('#messageContainer').show();
+      $('#footer_container').show()
+      $('#alertMessage').html(""); // Set user alert message to nothing!
 
       // Check if user is using iPhone so we don't autofocus on chat box.
       if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
@@ -193,19 +199,20 @@ socket.on('usernames', function(usernames) {
 // We'll use this to detect whether the is no username detected (e.g., after the server reboots)
 socket.on('my username', function(username) {
   console.log(typeof username + " " + username);
-  if (username === null) {
-    //$('#alertMessage').html("<strong>Error:</strong> Ack, sorry!! Disconnected from the server. Please log in again. :)");
-    //loadPage(); // Kick this user out and force them to log in again.
+  if (initialLoad == 1 && username === null) {
+    $('#alertMessage').html("<strong>Error:</strong> Ack, sorry!! Disconnected from the server. Please log in again. :)");
+    loadPage(); // Kick this user out and force them to log in again.
   }
 });
 
-/*
+// Display a message that a user has been detected typing.
+socket.on('user typing', function(getUsername) {
+  // Only let user know that others are typing. They don't need to worry about their own typing.
+  if (myUsername != getUsername) {
+    $("#typing").html(getUsername + " is typing. . .");
+  }
 
-<ul>
-   <li>Subitem One</li><li>
-   <a href="#">What's this?</a></li></ul>
-
-*/
+});
 
 socket.on('user count', function(userCount) {
 
@@ -244,4 +251,17 @@ $(document).ready(function () {
     //console.log("You scrolled!");
     userScrolled=true;
   })
+
+  // Detect if the user is typing anything.
+  $("#m").keypress(function() {
+    socket.emit('user typing', myUsername);
+    //$("#typing").html("User is typing some shit!");
+  });
+
+
+  setInterval(function () {
+    $("#typing").html("");
+  }, 1500);
+
+
 })
