@@ -198,7 +198,6 @@ socket.on('usernames', function(usernames) {
 
 // We'll use this to detect whether the is no username detected (e.g., after the server reboots)
 socket.on('my username', function(username) {
-  console.log(typeof username + " " + username);
   if (initialLoad == 1 && username === null) {
     $('#alertMessage').html("<strong>Error:</strong> Ack, sorry!! Disconnected from the server. Please log in again. :)");
     loadPage(); // Kick this user out and force them to log in again.
@@ -212,6 +211,15 @@ socket.on('user typing', function(getUsername) {
     $("#typing").html(getUsername + " is typing. . .");
   }
 
+});
+
+// Post status of users connecting and disconnecting in chat.
+socket.on('connection message', function(msg,username) {
+  if (typeof username == "undefined" || msg == "undefined has disconnected.") {
+      // Hide  message so undefined funkiness doesn't get posted and look weird.
+  } else {
+    $('#messages').append(msg);
+  }
 });
 
 socket.on('user count', function(userCount) {

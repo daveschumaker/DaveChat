@@ -82,6 +82,7 @@ io.on('connection', function(socket){
     usernames.push(username); // Add this to our user array.
     console.log('Active users: ' + usernames);
     io.emit('usernames', usernames); // Send array of usernames to client.
+    io.emit('connection message', "<p class=\"connectionMessage\">" + username + " has connected.</p>", username);
     userCount = usernames.length;
     io.emit('user count', userCount); // Send number of users to client.
   })
@@ -102,7 +103,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function() {
-
+    io.emit('connection message', "<p class=\"connectionMessage\">" + clientUsername + " has disconnected.</p>", clientUsername);
     usernames.remove(clientUsername);
     //io.emit('chat message', 'a user has disconnected. :(');
     console.log('Active users: ' + usernames);
